@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">MovieDemo</string>
+    <string name="base_url" translatable="false">https://api.themoviedb.org/3/</string>
+    <string name="api_key" translatable="false">3fa9058382669f72dcb18fb405b7a831</string>
+    <string name="generic_error">Error getting data, please try again</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="movie_image">Movie Image</string>
+</resources>
