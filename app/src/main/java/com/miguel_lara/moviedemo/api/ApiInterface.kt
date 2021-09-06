@@ -23,8 +23,8 @@ interface ApiInterface {
 
     @Headers("Cache-Control: public, max-stale=2419200") // 4 weeks
     @GET("configuration")
-    fun getConfiguration(): Call<Configuration>
+    suspend fun getConfiguration(): Configuration
 
     @GET("genre/movie/list?language=es-MX")
-    fun getGenre(): Call<GenresResponse>
+    suspend fun getGenre(): GenresResponse
 }
