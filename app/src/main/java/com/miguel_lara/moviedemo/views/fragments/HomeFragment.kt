@@ -9,8 +9,10 @@ import androidx.databinding.BindingAdapter
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.tabs.TabLayout
 import com.miguel_lara.moviedemo.R
 import com.miguel_lara.moviedemo.adapters.MoviesAdapter
+import com.miguel_lara.moviedemo.adapters.TrailersAdapter
 import com.miguel_lara.moviedemo.databinding.FragmentHomeBinding;
 import com.miguel_lara.moviedemo.helpers.EndlessScrollListener
 import com.miguel_lara.moviedemo.interfaces.MovieEvents
@@ -49,6 +51,18 @@ class HomeFragment : Fragment(), ScrollToBottomListener, MovieEvents {
             layoutManager = layoutMgr
             adapter = MoviesAdapter(mutableListOf(), this@HomeFragment)
         }
+        binding.tabOptions.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+            override fun onTabSelected(tab: TabLayout.Tab) {
+                homeVM.changeType(tab.position)
+                homeVM.loadData()
+            }
+            override fun onTabUnselected(tab: TabLayout.Tab) {
+
+            }
+            override fun onTabReselected(tab: TabLayout.Tab) {
+
+            }
+        })
         return binding.root
     }
 

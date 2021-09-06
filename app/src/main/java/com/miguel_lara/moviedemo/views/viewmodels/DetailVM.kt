@@ -5,12 +5,16 @@ import android.view.View
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.miguel_lara.moviedemo.App
 import com.miguel_lara.moviedemo.api.ApiClient
 import com.miguel_lara.moviedemo.api.ApiInterface
+import com.miguel_lara.moviedemo.api.Repository
 import com.miguel_lara.moviedemo.objects.Movie
 import com.miguel_lara.moviedemo.objects.MovieDetail
 import com.miguel_lara.moviedemo.objects.Movies
+import com.miguel_lara.moviedemo.objects.Trailer
+import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -26,6 +30,7 @@ class DetailVM: ViewModel() {
     private var _overview = MutableLiveData<String>()
     private var _runtime = MutableLiveData<String>()
     private var _link = MutableLiveData<String>()
+    private var _trailers = MutableLiveData<List<Trailer>>()
 
     val image: LiveData<String> get() { return _image }
     val title: LiveData<String> get() { return _title }
@@ -35,32 +40,20 @@ class DetailVM: ViewModel() {
     val overview: LiveData<String> get() { return _overview }
     val runtime: LiveData<String> get() { return _runtime }
     val link: LiveData<String> get() { return _link }
+    val trailers: LiveData<List<Trailer>> get() = _trailers
 
     fun setMovie(movie: Movie) {
         _movie.value = movie
 
-        val apiClient = ApiClient.getApiClient().create(ApiInterface::class.java)
-
-        apiClient.getMovieDetail(movie.id).enqueue(object : Callback<MovieDetail> {
-            override fun onFailure(call: Call<MovieDetail>, t: Throwable) {
-                Log.d("MV", "Error")
+        viewModelScope.launch {
+            val detail = Repository().getMovieDetails(movie.id)
+            detail.apply {
+                _overview.value = overview
+                _runtime.value = "Runtime: $runtime"
+                _link.value = homepage
+                _trailers.value = trailers
             }
-
-            override fun onResponse(
-                call: Call<MovieDetail>,
-                response: Response<MovieDetail>
-            ) {
-                val res = response.body()
-                if (response.code() == 200 &&  res!=null){
-                    response.body()!!.apply {
-                        _overview.value = overview
-                        _runtime.value = "Runtime: $runtime"
-                        _link.value = homepage
-                    }
-                }
-            }
-        })
-
+        }
         _image.value = Movie.getFullImageUrl(movie)
         _title.value = "Title: " + movie.title!!
         _year.value = "Year: " + movie.release_date!!

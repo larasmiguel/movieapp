@@ -8,12 +8,21 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.BindingAdapter
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.miguel_lara.moviedemo.R
+import com.miguel_lara.moviedemo.adapters.MoviesAdapter
+import com.miguel_lara.moviedemo.adapters.TrailersAdapter
 import com.miguel_lara.moviedemo.databinding.FragmentDetailBinding
+import com.miguel_lara.moviedemo.helpers.EndlessScrollListener
+import com.miguel_lara.moviedemo.interfaces.TrailerEvents
 import com.miguel_lara.moviedemo.objects.Movie
+import com.miguel_lara.moviedemo.objects.Trailer
 import com.miguel_lara.moviedemo.views.viewmodels.DetailVM
 import com.squareup.picasso.Picasso
 
@@ -22,7 +31,15 @@ fun setImageUrl(view: ImageView, poserPath: String) {
     Picasso.get().load(poserPath).into(view)
 }
 
-class DetailFragment : Fragment() {
+@BindingAdapter("data")
+fun setTrailerRVProperties(recyclerView: RecyclerView?, data: MutableList<Trailer>?) {
+    val adapter = recyclerView?.adapter
+    if (adapter is TrailersAdapter && data != null) {
+        adapter.setData(data)
+    }
+}
+
+class DetailFragment : Fragment(), TrailerEvents {
     private var movie: Movie? = null
     private var _binding: FragmentDetailBinding? = null
     private val binding get() = _binding!!
@@ -69,6 +86,11 @@ class DetailFragment : Fragment() {
                 startActivity(intent)
             }
         }
+        val layoutMgr = LinearLayoutManager(context)
+        binding.listTrailers.apply {
+            layoutManager = layoutMgr
+            adapter = TrailersAdapter(mutableListOf(), this@DetailFragment)
+        }
         setHasOptionsMenu(true)
         setupBackButton()
         return binding.root
@@ -82,5 +104,19 @@ class DetailFragment : Fragment() {
                     putSerializable("movie", movie)
                 }
             }
+    }
+
+    override fun onTrailerClick(trailer: Trailer) {
+        if (trailer.site?.lowercase().equals("youtube")) {
+            startActivity(
+                Intent(
+                    Intent.ACTION_VIEW,
+                    Uri.parse("https://www.youtube.com/watch?v=" + trailer.key)
+                )
+            )
+        }
+        else {
+            Toast.makeText(context, getString(R.string.only_youtube), Toast.LENGTH_SHORT).show();
+        }
     }
 }

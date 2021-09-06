@@ -41,7 +41,9 @@ data class MovieDetail (
 
     val vote_average: Double,
 
-    val vote_count: Long
+    val vote_count: Long,
+
+    var trailers: List<Trailer>
 )
 
 data class ProductionCompany (
